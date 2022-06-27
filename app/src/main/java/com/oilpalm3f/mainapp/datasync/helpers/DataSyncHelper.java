@@ -74,6 +74,7 @@ import okhttp3.Response;
 
 import static com.oilpalm3f.mainapp.cloudhelper.HttpClient.getOkHttpClient;
 import static com.oilpalm3f.mainapp.common.CommonConstants.selectedPlotCode;
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
 
 @SuppressWarnings("unchecked")
 
@@ -119,6 +120,7 @@ public class DataSyncHelper {
             @Override
             public void execute(boolean success, final HashMap<String, List> masterData, String msg) {
                 if (success) {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"performMasterSync",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     if (masterData != null && masterData.size() > 0) {
                         Log.v(LOG_TAG, "@@@ Master sync is success and data size is " + masterData.size());
                         final Set<String> tableNames = masterData.keySet();
@@ -133,6 +135,7 @@ public class DataSyncHelper {
                                             @Override
                                             public void execute(boolean success, String result, String msg) {
                                                 if (success) {
+                                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"performMasterSync -- Delete Row",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                                     dataAccessHandler.insertData(true, tableName, masterData.get(tableName), new ApplicationThread.OnComplete<String>() {
                                                         @Override
                                                         public void execute(boolean success, String result, String msg) {
@@ -151,6 +154,7 @@ public class DataSyncHelper {
                                                     });
 
                                                 } else {
+                                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"performMasterSync -- Delete Row",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                                     Log.v(LOG_TAG, "@@@ Master table deletion failed for " + tableName);
                                                 }
                                             }
@@ -183,6 +187,7 @@ public class DataSyncHelper {
                     }
                 } else {
                     ProgressBar.hideProgressBar();
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"performMasterSync",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     onComplete.execute(false, null, "Master sync failed. Please try again");
                 }
             }
@@ -207,6 +212,7 @@ public class DataSyncHelper {
                     @Override
                     public void execute(boolean success, final LinkedHashMap<String, List> transDataMap, String msg) {
                         if (success) {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"performCollectionCenterTransactionsSync",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             if (transDataMap != null && transDataMap.size() > 0) {
                                 Log.v(LOG_TAG, "number " +msg);
                                 Log.v(LOG_TAG, "transactions data size " + transDataMap.size());
@@ -218,6 +224,7 @@ public class DataSyncHelper {
                             }
                         } else {
                             ProgressBar.hideProgressBar();
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"performCollectionCenterTransactionsSync",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             Log.v(LOG_TAG, "@@@ Transactions sync failed due to data retrieval error");
                             onComplete.execute(false, result, "Transactions sync failed due to data retrieval error");
                         }
@@ -255,6 +262,7 @@ public class DataSyncHelper {
                 transObj.put(tableName, new JSONArray(dat));
             } catch (JSONException e) {
                 e.printStackTrace();
+                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"postCollectionCenterTransactionsData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
             }
             Log.v(LOG_TAG, "@@@@ check.." + transObj.toString());
             Log.v(LOG_TAG, "@@@@ checknumber.." + number);
@@ -262,6 +270,7 @@ public class DataSyncHelper {
                 @Override
                 public void execute(boolean success, String result, String msg) {
                     if (success) {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"postCollectionCenterTransactionsData",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         if(tableName.equals("VisitLog"))
                         {
                             ccdataAccessHandler.executeRawQuery(String.format(Queries.getInstance().updateVisitServerUpdatedStatus(), tableName));
@@ -299,6 +308,7 @@ public class DataSyncHelper {
                             postCollectionCenterTransactionsData(context, CollectiontableNamesList.get(transactionsCheck), ccdataAccessHandler,number, onComplete);
                         }
                     } else {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"postCollectionCenterTransactionsData",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         ApplicationThread.uiPost(LOG_TAG, "Sync is failed", new Runnable() {
                             @Override
                             public void run() {
@@ -356,6 +366,7 @@ public class DataSyncHelper {
             transObj = new JSONObject(dat);
         } catch (JSONException e) {
             e.printStackTrace();
+            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"sendImageDetails", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
         }
 
         Log.v(LOG_TAG, "@@@@ check.." + transObj.toString());
@@ -364,6 +375,7 @@ public class DataSyncHelper {
             @Override
             public void execute(boolean success, String result, String msg) {
                 if (success) {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"sendImageDetails",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     String COlFarmerId = (imagesData.get(imagesCount).getFarmerCode()).substring(0,9);
                     if (COlFarmerId.equalsIgnoreCase("CCFARMERW")){
                         dataAccessHandler.executeRawQuery(Queries.getInstance().updatedImageDetailsStatus(imagesData.get(imagesCount).getCollectionCode(),imagesData.get(imagesCount).getFarmerCode(),
@@ -386,6 +398,7 @@ public class DataSyncHelper {
                         sendImageDetails(context, imagesData, dataAccessHandler, onComplete);
                     }
                 } else {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"sendImageDetails",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     imagesCount++;
                     if (imagesCount == imagesData.size()) {
                         selectedPlotCode.clear();
@@ -423,6 +436,7 @@ public class DataSyncHelper {
                 transObj.put("UpdateStockTransfer", new JSONArray(dat));
             } catch (JSONException e) {
                 e.printStackTrace();
+                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"syncStockTransferReceiveData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
             }
 
             Log.v(LOG_TAG, "@@@@ check.." + transObj.toString());
@@ -431,6 +445,7 @@ public class DataSyncHelper {
                 @Override
                 public void execute(boolean success, String result, String msg) {
                     if (success) {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"syncStockTransferReceiveData",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         ccDataAccessHandler.executeRawQuery(String.format(Queries.getInstance().updateStockReceiveRecord(stockReceiveRefresh.getCode()), "StockTransferReceive"));
                           stReceiveCount++;
 
@@ -440,6 +455,7 @@ public class DataSyncHelper {
                               onComplete.execute(true, result, "Sync Success");
                           }
                     } else {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"syncStockTransferReceiveData",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         stReceiveCount++;
                         if (stReceiveCount == count){
                             CommonUtils.isNotSyncScreen = false;
@@ -510,16 +526,19 @@ public class DataSyncHelper {
                 transObj.put("LocationTracker", new JSONArray(dat));
             } catch (JSONException e) {
                 e.printStackTrace();
+                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"sendTrackingData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
             }
             Log.v(LOG_TAG, "@@@@ check.." + transObj.toString());
             CloudDataHandler.placeDataInCloud(transObj, Config.live_url + Config.locationTrackingURL, new ApplicationThread.OnComplete<String>() {
                         @Override
                         public void execute(boolean success, String result, String msg) {
                             if (success) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"sendTrackingData",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 dataAccessHandler.executeRawQuery(String.format(Queries.getInstance().updateVisitServerUpdatedStatus(), DatabaseKeys.LocationTracker));
                                 Log.v(LOG_TAG, "@@@ Transactions sync success for LocationTracker");
                                 onComplete.execute(true, null, "Sync is success");
                             } else {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"sendTrackingData",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 onComplete.execute(false, null, "Sync is failed");
                             }
                         }
@@ -540,6 +559,7 @@ public class DataSyncHelper {
             @Override
             public void execute(boolean success, Object result, String msg) {
                 if (success) {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"startTransactionSync",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     try {
                         Log.v(LOG_TAG, "@@@@ count here " + result.toString());
                        // Map countMap = CommonUtils.toMap(new JSONObject(result.toString()));
@@ -555,6 +575,7 @@ public class DataSyncHelper {
                         }
                         //prepareIndexes(finalDate, countMap, context, finalProgressDialogFragment);
                     } catch (Exception e) {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"startTransactionSync",CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         e.printStackTrace();
                         ProgressBar.hideProgressBar();
                         if (null != progressDialogFragment) {
@@ -563,6 +584,7 @@ public class DataSyncHelper {
                         CommonUtils.showToast("Transaction sync failed due to ", context);
                     }
                 } else {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"startTransactionSync",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     if (null != progressDialogFragment) {
                         progressDialogFragment.dismiss();
                     }
@@ -874,6 +896,7 @@ public class DataSyncHelper {
                     resultMessage = "failed";
                 }
             } catch (Exception e) {
+                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"doInBackground",CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                 resultMessage = e.getMessage();
                 Log.e(LOG_TAG, "@@@ data sync failed for "+tableName);
             }
@@ -904,9 +927,11 @@ public class DataSyncHelper {
                             @Override
                             public void execute(boolean success, Object result, String msg) {
                                 if (success) {
+                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"onPostExecute",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                     updateSyncDate(context);
                                     UiUtils.showCustomToastMessage("Data synced successfully", context, 0);
                                 } else {
+                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"onPostExecute",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                     UiUtils.showCustomToastMessage(msg, context, 1);
                                 }
                                 if (null != progressDialogFragment && !CommonUtils.currentActivity.isFinishing()) {
@@ -937,6 +962,7 @@ public class DataSyncHelper {
                 @Override
                 public void execute(boolean success, Object result, String msg) {
                     if (success) {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateTransactionData",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         reverseSyncTransCount++;
                         if (reverseSyncTransCount == transactionsData.size()) {
                             onComplete.execute(success, "data updated successfully", "");
@@ -945,6 +971,7 @@ public class DataSyncHelper {
                             updateTransactionData(transactionsData, dataAccessHandler, tableNames, progressDialogFragment, onComplete);
                         }
                     } else {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateTransactionData",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         reverseSyncTransCount++;
                         if (reverseSyncTransCount == transactionsData.size()) {
                             onComplete.execute(success, "data updated successfully", "");
@@ -980,6 +1007,7 @@ public class DataSyncHelper {
                     dataToInsert.add(CommonUtils.toMap(ccData));
                     recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "Code", farmerData.getCode()));
                 } catch (JSONException e) {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                 }
             }else if (tableName.equalsIgnoreCase(DatabaseKeys.TABLE_ADDRESS)) {
@@ -990,6 +1018,7 @@ public class DataSyncHelper {
                    ccData = new JSONObject(gson.toJson(plotData));
                    dataToInsert.add(CommonUtils.toMap(ccData));
                } catch (JSONException e) {
+                   palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                    Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                }
                recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "Code", plotData.getCode()));
@@ -1002,6 +1031,7 @@ public class DataSyncHelper {
                     ccData = new JSONObject(gson.toJson(plotData));
                     dataToInsert.add(CommonUtils.toMap(ccData));
                 } catch (JSONException e) {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                 }
                 recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "Code", plotData.getCode()));
@@ -1013,6 +1043,7 @@ public class DataSyncHelper {
                     ccData = new JSONObject(gson.toJson(farmerHistoryData));
                     dataToInsert.add(CommonUtils.toMap(ccData));
                 } catch (JSONException e) {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                 }
                 recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "PlotCode", farmerHistoryData.getPlotcode()));
@@ -1023,6 +1054,7 @@ public class DataSyncHelper {
                    ccData = new JSONObject(gson.toJson(data));
                    dataToInsert.add(CommonUtils.toMap(ccData));
                } catch (JSONException e) {
+                   palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                    Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                }
                recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "FarmerCode", data.getFarmercode()));
@@ -1033,6 +1065,7 @@ public class DataSyncHelper {
                    ccData = new JSONObject(gson.toJson(data));
                    dataToInsert.add(CommonUtils.toMap(ccData));
                } catch (JSONException e) {
+                   palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                    Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                }
                recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "FarmerCode", data.getFarmercode()));
@@ -1045,6 +1078,7 @@ public class DataSyncHelper {
                    dataToInsert.add(CommonUtils.toMap(ccData));
                    recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "Code", collectionfarmerData.getCode()));
                } catch (JSONException e) {
+                   palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                    Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                }
            }
@@ -1057,6 +1091,7 @@ public class DataSyncHelper {
 //                   dataToInsert.add(CommonUtils.toMap(ccData));
 //                   recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "Code", collectionData.getCode()));
 //               } catch (JSONException e) {
+//            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
 //                   Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
 //               }
 //           }
@@ -1067,6 +1102,7 @@ public class DataSyncHelper {
                    ccData = new JSONObject(gson.toJson(data));
                    dataToInsert.add(CommonUtils.toMap(ccData));
                } catch (JSONException e) {
+                   palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                    Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                }
                recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "FarmerCode", data.getFarmercode()));
@@ -1077,6 +1113,7 @@ public class DataSyncHelper {
                    ccData = new JSONObject(gson.toJson(data));
                    dataToInsert.add(CommonUtils.toMap(ccData));
                } catch (JSONException e) {
+                   palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                    Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                }
                recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "FarmerCode", data.getFarmercode()));
@@ -1087,6 +1124,7 @@ public class DataSyncHelper {
                    ccData = new JSONObject(gson.toJson(data));
                    dataToInsert.add(CommonUtils.toMap(ccData));
                } catch (JSONException e) {
+                   palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateDataIntoDataBase", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                    Log.e(LOG_TAG, "####" + e.getLocalizedMessage());
                }
                recordExisted = dataAccessHandler.checkValueExistedInDatabase(Queries.getInstance().checkRecordStatusInTable(tableName, "FarmerCode", data.getFarmercode()));

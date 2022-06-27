@@ -29,6 +29,7 @@ import com.oilpalm3f.mainapp.cloudhelper.Log;
 import com.oilpalm3f.mainapp.collectioncenter.FarmersDetailsScreen;
 import com.oilpalm3f.mainapp.collectioncenter.OperateAdditionalPlots;
 import com.oilpalm3f.mainapp.collectioncenter.collectioncentermodels.CollectionCenter;
+import com.oilpalm3f.mainapp.common.CommonConstants;
 import com.oilpalm3f.mainapp.common.CommonUtils;
 import com.oilpalm3f.mainapp.database.DataAccessHandler;
 import com.oilpalm3f.mainapp.datasync.helpers.DataManager;
@@ -51,6 +52,7 @@ import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.COLLECTION_CENT
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.EXTRA_PLOTS;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.SELECTED_FARMER_DATA;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.TOTAL_FARMERS_DATA;
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
 
 /**
  * Created by skasam on 9/27/2016.
@@ -227,6 +229,7 @@ public class FarmersListScreenForCC extends AppCompatActivity implements Recycle
                     public void execute(boolean success, final List<BasicFarmerDetails> farmerDetails, String msg) {
                         ProgressBar.hideProgressBar();
                         if (success) {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getAllUsers", CommonConstants.TAB_ID,"result.toString()",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             if (farmerDetails != null && farmerDetails.size() > 0) {
                                 mFarmersList.clear();
                                 mFinalFarmersList.clear();
@@ -257,6 +260,7 @@ public class FarmersListScreenForCC extends AppCompatActivity implements Recycle
                             }
                         } else {
                             tvNorecords.setVisibility(View.VISIBLE);
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getAllUsers",CommonConstants.TAB_ID,"result.toString()",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             Log.v(LOG_TAG, "@@@ Error while getting data from data base");
                         }
                     }

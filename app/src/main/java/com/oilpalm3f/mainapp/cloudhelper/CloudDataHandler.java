@@ -1,5 +1,7 @@
 package com.oilpalm3f.mainapp.cloudhelper;
 
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
+
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -41,16 +43,19 @@ public class CloudDataHandler {
                         @Override
                         public void execute(boolean success, String result, String msg) {
                             if (success) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"placeDataInCloud", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 try {
                                   Log.v(LOG_TAG, "@@@ Transactions sync success for " + result);
                                     onComplete.execute(true, result, msg);
                                 } catch (Exception e) {
+                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"placeDataInCloud", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                     e.printStackTrace();
                                    Log.v(LOG_TAG, "@@@ Transactions sync success for " + result);
 
                                     onComplete.execute(true, result, msg);
                                 }
                             } else {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"placeDataInCloud", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 Log.v(LOG_TAG, "@@@ Transactions sync failed for " + result);
                                 onComplete.execute(false, result, msg);
                             }
@@ -74,14 +79,19 @@ public class CloudDataHandler {
                     @Override
                     public void execute(boolean success, String result, String msg) {
                         if (success) {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getRecordStatus", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             try {
                                 onComplete.execute(success, result, msg);
                             } catch (Exception e) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getRecordStatus", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 e.printStackTrace();
                                 onComplete.execute(false, result, msg);
                             }
-                        } else
+                        } else{
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getRecordStatus", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             onComplete.execute(success, result, msg);
+                        }
+
                     }
                 });
             }
@@ -98,6 +108,7 @@ public class CloudDataHandler {
                     @Override
                     public void execute(boolean success, String result, String msg) {
                         if (success) {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getGenericData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             try {
                                 JSONObject parentData = new JSONObject(result);
                                 List<DataCountModel> dataCountModelList = new ArrayList<DataCountModel>();
@@ -119,6 +130,7 @@ public class CloudDataHandler {
                                 onComplete.execute(success, dataCountModelList, msg);
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getGenericData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 onComplete.execute(success, null, msg);
                                 SharedPrefManager.set_isDataSyncRunning(false);
                             }
@@ -127,6 +139,7 @@ public class CloudDataHandler {
                             SharedPrefManager.set_isDataSyncRunning(false);
 
                         } else {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getGenericData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             onComplete.execute(success, null, msg);
                             SharedPrefManager.set_isDataSyncRunning(false);
                         }
@@ -169,6 +182,7 @@ public class CloudDataHandler {
                     @Override
                     public void execute(boolean success, String result, String msg) {
                         if (success) {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getMasterData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             try {
 
                                 JSONObject parentMasterDataObject = new JSONObject(result);
@@ -193,10 +207,14 @@ public class CloudDataHandler {
 
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getMasterData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 onComplete.execute(success, null, msg);
                             }
-                        } else
+                        } else{
                             onComplete.execute(success, null, msg);
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getMasterData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
+                        }
+
                     }
                 });
             }
@@ -213,6 +231,7 @@ public class CloudDataHandler {
                     @Override
                     public void execute(boolean success, String result, String msg) {
                         if (success) {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getTransactionsData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             try {
 
                                 JSONObject parentMasterDataObject = new JSONObject(result);
@@ -244,10 +263,14 @@ public class CloudDataHandler {
 
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getTransactionsData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 onComplete.execute(success, null, msg);
                             }
-                        } else
+                        } else{
                             onComplete.execute(success, null, msg);
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getTransactionsData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
+                        }
+
                     }
                 });
             }
@@ -403,6 +426,7 @@ public class CloudDataHandler {
                     public void execute(boolean success, String result, String msg) {
                         try {
                             if (success) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getTabTransData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 List dataToInsert = new ArrayList();
                                 JSONArray parentTransactionSyncObject = new JSONArray(result);
                                 int length = parentTransactionSyncObject.length();
@@ -420,10 +444,12 @@ public class CloudDataHandler {
                                 }
                                 onComplete.execute(success, dataToInsert, msg);
                             } else {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getTabTransData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 onComplete.execute(success, null, msg);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getTabTransData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             onComplete.execute(success, null, msg);
                         }
                     }
@@ -442,6 +468,7 @@ public class CloudDataHandler {
                     @Override
                     public void execute(boolean success, String result, String msg) {
                         if (success) {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getFarmerPhotosData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             try {
                                 Gson gson = new Gson();
                                 Type type = new TypeToken<List<FarmerPhotos>>() {
@@ -450,10 +477,14 @@ public class CloudDataHandler {
                                 onComplete.execute(success, farmerPhotosList, msg);
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getFarmerPhotosData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 onComplete.execute(success, null, msg);
                             }
-                        } else
+                        } else{
                             onComplete.execute(success, null, msg);
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getFarmerPhotosData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
+                        }
+
                     }
                 });
             }

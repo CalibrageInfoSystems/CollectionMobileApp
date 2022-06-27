@@ -56,6 +56,7 @@ import static com.oilpalm3f.mainapp.database.DatabaseKeys.TABLE_STOCK_TRANSFER;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.COLLECTION_CENTER_DATA;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.COLLECTION_CENTER_ID;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.USER_DETAILS;
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
 
 /**
  * Created by Bali Reddy on 25/02/19.
@@ -164,7 +165,7 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
         }
 
 //Generating Receipt Code
-        receiptCode = ccDataAccessHandler.getGeneratedCollectionCode(selectedCollectionCenter.getCode(), ccDataAccessHandler.ST_RECEIPT_CODE_INITIAL, TABLE_STOCK_TRANSFER,days);
+        receiptCode = ccDataAccessHandler.getGeneratedCollectionCode(selectedCollectionCenter.getCode(), ccDataAccessHandler.ST_RECEIPT_CODE_INITIAL, TABLE_STOCK_TRANSFER,dayyys);
 
 //Generate Receipt On Click Listener
         generateReceipt.setOnClickListener(new View.OnClickListener() {
@@ -173,10 +174,10 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
 
                  enablePrintBtn(false);
                 saveStockTransferData(getActivity());
-//                FragmentManager fm = getChildFragmentManager();
-//                PrinterChooserFragment printerChooserFragment = new PrinterChooserFragment();
-//                printerChooserFragment.setPrinterType(StockTransferReceipt.this);
-//                printerChooserFragment.show(fm, "bluetooth fragment");
+                FragmentManager fm = getChildFragmentManager();
+                PrinterChooserFragment printerChooserFragment = new PrinterChooserFragment();
+                printerChooserFragment.setPrinterType(StockTransferReceipt.this);
+                printerChooserFragment.show(fm, "bluetooth fragment");
             }
         });
     }
@@ -260,6 +261,7 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
                             @Override
                             public void execute(boolean success, Object result, String msg) {
                                 if (success) {
+                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"addStockTransferImage", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                     enablePrintBtn(true);
                                     ApplicationThread.uiPost(LOG_TAG, "transactions sync message", new Runnable() {
                                         @Override
@@ -267,18 +269,19 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
                                           DataManager.getInstance().deleteData(DataManager.stockTransferImage);
                                           DataManager.getInstance().deleteData(DataManager.To_COLLECTION_CENTER_DATA);
                                             UiUtils.showCustomToastMessage("Successfully data sent to server", getActivity(), 0);
-                                            getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                            //getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 //                                            getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
 //                                                        getActivity().finish();
                                         }
                                     });
                                 } else {
+                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"addStockTransferImage", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                     ApplicationThread.uiPost(LOG_TAG, "transactions sync failed message", new Runnable() {
                                         @Override
                                         public void run() {
                                             enablePrintBtn(true);
                                             UiUtils.showCustomToastMessage("Data sync failed", getActivity(), 1);
-                                            getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                            //getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                                         }
                                     });
                                 }
@@ -286,7 +289,7 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
                         });
                     } else {
                         enablePrintBtn(true);
-                        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                        //getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 //                        getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
 //                                    getActivity().finish();
                     }
@@ -318,7 +321,8 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
         mPrinter.printText("  Stock Transfer Dispatch Receipt " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
-        mPrinter.setLeftMargin(15, 15);
+        /*mPrinter.setLeftMargin(15, 15);*/
+        mPrinter.setLeftMargin(0, 0);
         sb.append("==============================================" + "\n");
         sb.append("  DateTime: ");
         sb.append(" ").append(currentDate_am_pm).append("\n");
@@ -375,7 +379,7 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
         Integer totalWeight = (int) (selectedStockTransfer.getNetWeight());
         String netWeight_str = StringUtils.leftPad(String.valueOf(totalWeight), 6, "0");
 
-        String hashString = ccDataAccessHandler.getCurrentYear() + tab_Id + stFromCCId + stToCCId + convertedNumber +days+ netWeight_str;
+        String hashString = ccDataAccessHandler.getCurrentYear() + tab_Id + stFromCCId + stToCCId + convertedNumber +dayyys+ netWeight_str;
         String qrCodeValue = hashString.substring(0,27);
         Barcode barcode = new Barcode(PrinterConstants.BarcodeType.QRCODE, 3, 95, 3, qrCodeValue);
 
@@ -386,9 +390,20 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
 //        mPrinter.printBarCode(barcode);
 //        print_qr_code(mPrinter,qrCodeValue);
 
-        if(CommonConstants.PrinterName.contains("AMIGOS")){
+        /*if(CommonConstants.PrinterName.contains("AMIGOS")){
             com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG,"########### NEW ##############");
             print_qr_code(mPrinter,qrCodeValue);
+        }else{
+            com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG,"########### OLD ##############");
+            mPrinter.printBarCode(barcode);
+        }*/
+
+        if((CommonConstants.PrinterName.contains("AMIGOS")) && !(CommonConstants.PrinterName.contains("G-8BT3"))){
+            com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG,"########### NEW ##############");
+            print_qr_code(mPrinter,qrCodeValue);
+        }else if (CommonConstants.PrinterName.contains("G-8BT3 AMIGOS")){
+            com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG,"########### NEWEST ##############");
+            print_qr_codee(mPrinter,qrCodeValue);
         }else{
             com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG,"########### OLD ##############");
             mPrinter.printBarCode(barcode);
@@ -422,7 +437,9 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
         } finally {
             if (printSuccess) {
                 if (printCount == 2) {
-                    saveStockTransferData(context);
+                    //saveStockTransferData(context);
+                    getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    UiUtils.showCustomToastMessage("Print Success", getContext(), 0);
                 }
             }
         }
@@ -580,5 +597,61 @@ public class StockTransferReceipt extends BaseFragment implements BluetoothDevic
     @Override
     public void enablingPrintButton(boolean rePrint) {
         enablePrintBtn(rePrint);
+    }
+
+    public void print_qr_codee(PrinterInstance mPrinter,String qrdata)
+    {
+        int store_len = qrdata.length() + 3;
+        byte store_pL = (byte) (store_len % 256);
+        byte store_pH = (byte) (store_len / 256);
+
+
+        // QR Code: Select the modelc
+        //Hex     1D      28      6B      04      00      31      41      n1(x32)     n2(x00) - size of model
+        // set n1 [49 x31, model 1] [50 x32, model 2] [51 x33, micro qr code]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=140
+        //byte[] modelQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x04, (byte)0x00, (byte)0x31, (byte)0x41, (byte)0x32, (byte)0x00};//original
+        byte[] modelQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x04, (byte)0x00, (byte)0x31, (byte)0x41, (byte)0x49, (byte)0x00};
+
+        // QR Code: Set the size of module
+        // Hex      1D      28      6B      03      00      31      43      n
+        // n depends on the printer
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
+
+        //byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x10};//original
+        byte[] sizeQR = {(byte)0x1d, (byte)0x0, (byte)0x0, (byte)0x0, (byte)0x00, (byte)0x0, (byte)0x0, (byte)0x10};
+
+
+        //Hex     1D      28      6B      03      00      31      45      n
+        // Set n for error correction [48 x30 -> 7%] [49 x31-> 15%] [50 x32 -> 25%] [51 x33 -> 30%]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=142
+        byte[] errorQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x45, (byte)0x31};//original
+
+
+
+        // QR Code: Store the data in the symbol storage area
+        // Hex      1D      28      6B      pL      pH      31      50      30      d1...dk
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=143
+        //                        1D          28          6B         pL          pH  cn(49->x31) fn(80->x50) m(48->x30) d1…dk
+        byte[] storeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, store_pL, store_pH, (byte)0x31, (byte)0x50, (byte)0x30};//original
+
+
+        // QR Code: Print the symbol data in the symbol storage area
+        // Hex      1D      28      6B      03      00      31      51      m
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=144
+        byte[] printQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x51, (byte)0x30};//original
+
+        // flush() runs the print job and clears out the print buffer
+//        flush();
+
+        // write() simply appends the data to the buffer
+        mPrinter.sendByteData(modelQR);
+
+        mPrinter.sendByteData(sizeQR);
+        mPrinter.sendByteData(errorQR);
+        mPrinter.sendByteData(storeQR);
+        mPrinter.sendByteData(qrdata.getBytes());
+        mPrinter.sendByteData(printQR);
+
     }
 }

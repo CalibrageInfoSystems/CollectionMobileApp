@@ -2,6 +2,8 @@ package com.oilpalm3f.mainapp.collectioncenter;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.oilpalm3f.mainapp.BroadCastReciver.myBackgroundProcess;
 import com.oilpalm3f.mainapp.R;
 import com.oilpalm3f.mainapp.StockTransfer.ReciveStockTransfer;
 import com.oilpalm3f.mainapp.StockTransfer.SendStockTransfer;
@@ -77,6 +80,7 @@ import static com.oilpalm3f.mainapp.common.CommonConstants.changecollectionType;
 import static com.oilpalm3f.mainapp.common.CommonConstants.collectionType;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.COLLECTION_CENTER_DATA;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.EXTRA_PLOTS;
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
 
 //Home Screen
 public class CollectionCenterHomeScreen extends OilPalmBaseActivity {
@@ -118,6 +122,7 @@ public class CollectionCenterHomeScreen extends OilPalmBaseActivity {
                                 public void execute(boolean success, final String address, final String geoCountry) {
                                     Log.d(LOG_TAG, "### in getAddressByLocation from :" + LOG_TAG);
                                     if (success) {
+                                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"mLbsMessageReceiver", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                         Log.v(LOG_TAG, "### address received " + address);
                                         if (!TextUtils.isEmpty(address)) {
                                             receivedAddr = true;
@@ -135,6 +140,7 @@ public class CollectionCenterHomeScreen extends OilPalmBaseActivity {
 
                                         Log.v(LOG_TAG, "@@@ List of collection centers " + collectionCenterList);
                                     } else {
+                                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"mLbsMessageReceiver", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                         ApplicationThread.nuiPost(LOG_TAG, "", new Runnable() {
                                             @Override
                                             public void run() {
@@ -236,6 +242,17 @@ public class CollectionCenterHomeScreen extends OilPalmBaseActivity {
 
             }
         }
+
+        Intent intentt = new Intent(CollectionCenterHomeScreen.this, myBackgroundProcess.class);
+        intentt.setAction("BackgroundProcess");
+        Log.v(LOG_TAG, "BackgroundProcess");
+        //Set the repeated Task
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(CollectionCenterHomeScreen.this, 0, intentt, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        //86400000 -- 24 hr
+        //600000 -- 1 min
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 0, 86400000, pendingIntent);
+
 
 //Reports Button On Click Listener
         reportsRel.setOnClickListener(new View.OnClickListener() {
@@ -349,6 +366,9 @@ public class CollectionCenterHomeScreen extends OilPalmBaseActivity {
 
             }
         });
+
+
+
         //Receive Stock On Click Listener
         receiveStockRel.setOnClickListener(new View.OnClickListener() {
             @Override

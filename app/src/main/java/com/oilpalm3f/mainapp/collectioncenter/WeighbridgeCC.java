@@ -89,6 +89,7 @@ import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.COLLECTION_CENT
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.PRIVATE_WEIGHBRIDGE_INFO;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.SELECTED_FARMER_DATA;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.USER_DETAILS;
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -1414,11 +1415,13 @@ public class WeighbridgeCC extends BaseFragment {
                 @Override
                 public void execute(boolean success, String result, String msg) {
                     if (success) {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveObservationImages", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         DataManager.getInstance().addData(DataManager.Manual_Images, "DataSaved");
                         Toast.makeText(getActivity(), "Data saving ", Toast.LENGTH_LONG).show();
 
                         getActivity().onBackPressed();
                     } else {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveObservationImages", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         Toast.makeText(getActivity(), "Data saving failed", Toast.LENGTH_LONG).show();
 
                     }

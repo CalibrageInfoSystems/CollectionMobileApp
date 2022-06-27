@@ -19,14 +19,16 @@ public class Config {
 //      public static  String live_url = "http://183.82.103.171:8085/API";
      //public static  String live_url = "http://182.18.139.166/3FOilPalm/API/api";
       //public static  String live_url = "http://183.82.111.111/3FOilPalm_Live/API/api";
-       public static String live_url = "http://183.82.111.111/3FOilPalm/API/api"; //test
+       //public static String live_url = "http://183.82.111.111/3FOilPalm/API/api"; //test
+       public static String live_url = "http://182.18.157.215/3FSmartPalm/API/api";//new Test
 
     //local URl
     public static void initialize() {
 
         if (BuildConfig.BUILD_TYPE.equalsIgnoreCase("release")) {
            //live_url = "http://183.82.111.111/3FOilPalm_Live/API/api" ;
-          live_url = "http://183.82.111.111/3FOilPalm/API/api" ;//test
+          //live_url = "http://183.82.111.111/3FOilPalm/API/api" ;//test
+            live_url = "http://182.18.157.215/3FSmartPalm/API/api"; //new Test
 //      //      live_url = "http://183.82.111.111/3FOilPalm/API/api" ;
          //live_url = "http://182.18.139.166/3FOilPalm/API/api" ;
      //             live_url = "http://120.138.8.8:9020/API/api";
@@ -34,7 +36,8 @@ public class Config {
         } else {
        //   live_url = "http://120.138.8.8:9020/API/api";
             //live_url = "http://182.18.139.166/3FOilPalm/API/api" ;
-            live_url = "http://183.82.111.111/3FOilPalm/API/api" ; //test
+            //live_url = "http://183.82.111.111/3FOilPalm/API/api" ; //test
+            live_url = "http://182.18.157.215/3FSmartPalm/API/api"; //new Test
 //            live_url = "http://183.82.111.111/3FOilPalm/API/api" ;
             //live_url = "http://183.82.111.111/3FOilPalm_Live/API/api" ;
 

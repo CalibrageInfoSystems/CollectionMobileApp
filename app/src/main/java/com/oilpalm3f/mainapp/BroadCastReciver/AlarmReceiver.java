@@ -1,5 +1,7 @@
 package com.oilpalm3f.mainapp.BroadCastReciver;
 
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
+
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -94,6 +96,7 @@ public class AlarmReceiver  extends BroadcastReceiver {
             @Override
             public void execute(boolean success, final HashMap<String, List> masterData, String msg) {
                 if (success) {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"syncMaster", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     if (masterData != null && masterData.size() > 0) {
                       Log.v(LOG_TAG, "@@@ Master sync is success and data size is " + masterData.size());
                         final Set<String> tableNames = masterData.keySet();
@@ -108,6 +111,7 @@ public class AlarmReceiver  extends BroadcastReceiver {
                                             @Override
                                             public void execute(boolean success, String result, String msg) {
                                                 if (success) {
+                                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"syncMaster", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                                     dataAccessHandler.insertData(tableName, masterData.get(tableName), mContext, new ApplicationThread.OnComplete<String>() {
                                                         @Override
                                                         public void execute(boolean success, String result, String msg) {
@@ -132,6 +136,7 @@ public class AlarmReceiver  extends BroadcastReceiver {
                                                         }
                                                     });
                                                 } else {
+                                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"syncMaster", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                                         Log.v(LOG_TAG, "@@@ Master table deletion failed for " + tableName);
                                                 }
                                             }
@@ -178,7 +183,7 @@ public class AlarmReceiver  extends BroadcastReceiver {
 
                 } else {
                     ProgressBar.hideProgressBar();
-
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"syncMaster", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     Toast.makeText(mContext, "Master sync failed. Please try again", Toast.LENGTH_SHORT).show();
              //       EventBus.getDefault().post(false);
 

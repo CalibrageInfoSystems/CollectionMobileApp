@@ -1,5 +1,7 @@
 package com.oilpalm3f.mainapp.database;
 
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -7,6 +9,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.oilpalm3f.mainapp.cloudhelper.ApplicationThread;
+import com.oilpalm3f.mainapp.common.CommonConstants;
 import com.oilpalm3f.mainapp.common.CommonUtils;
 import com.oilpalm3f.mainapp.datasync.helpers.DataManager;
 import com.oilpalm3f.mainapp.dbmodels.FileRepository1;
@@ -30,11 +33,13 @@ public class DataSavingHelper {
                 @Override
                 public void execute(boolean success, String result, String msg) {
                     if (success) {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveOFTObservationTakenImages", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         Log.v(LOG_TAG, "@@@ Manual Images  data saved successfully");
                         DataManager.getInstance().deleteData(DataManager.Manual_Images);
                         oncomplete.execute(true, "Manual Images   data saved successfully", "");
                         //   saveEconomicData(context, oncomplete);
                     } else {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveOFTObservationTakenImages", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         Log.e(LOG_TAG, "@@@ Manual Images  data saving failed due to " + msg);
                         oncomplete.execute(false, "data saving failed for Manual Images", "");
                         //  saveEconomicData(context, oncomplete);
@@ -58,22 +63,10 @@ public class DataSavingHelper {
                     dataToInsert.add(CommonUtils.toMap(ccData));
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "@@@ error while converting Manual Images Details data");
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getOFTObservationImages", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                 }
             }
         }
         return dataToInsert;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

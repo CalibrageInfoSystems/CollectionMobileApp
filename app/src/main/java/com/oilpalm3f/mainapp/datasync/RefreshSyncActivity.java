@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.oilpalm3f.mainapp.datasync.helpers.DataSyncHelper.PREVIOUS_SYNC_DATE;
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
 
 /**
  * Created by skasam on 9/30/2016.
@@ -257,6 +258,7 @@ public class RefreshSyncActivity extends AppCompatActivity implements View.OnCli
             logCount.setText(dataAccessHandler.getCountValue(Queries.getInstance().getContVisitLog()));
         } catch (Exception e) {
             e.printStackTrace();
+            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"bindData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
         }
     }
 
@@ -279,6 +281,7 @@ public class RefreshSyncActivity extends AppCompatActivity implements View.OnCli
                         @Override
                         public void execute(boolean success, final Object result, String msg) {
                             if (success) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"btsynctoserver", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 ApplicationThread.uiPost(LOG_TAG, "transactions sync message", new Runnable() {
                                     @Override
                                     public void run() {
@@ -290,6 +293,7 @@ public class RefreshSyncActivity extends AppCompatActivity implements View.OnCli
                                     }
                                 });
                             } else {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"btsynctoserver", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 ApplicationThread.uiPost(LOG_TAG, "transactions sync failed message", new Runnable() {
                                     @Override
                                     public void run() {
@@ -319,6 +323,7 @@ public class RefreshSyncActivity extends AppCompatActivity implements View.OnCli
                         public void execute(boolean success, Object result, String msg) {
                             ProgressBar.hideProgressBar();
                             if (success) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"btnmastersync", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 if (!msg.equalsIgnoreCase("Sync is up-to-date")) {
                                     Toast.makeText(RefreshSyncActivity.this, "Data synced successfully", Toast.LENGTH_SHORT).show();
 
@@ -349,6 +354,7 @@ public class RefreshSyncActivity extends AppCompatActivity implements View.OnCli
                                     });
                                 }
                             } else {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"btnmastersync", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 Log.v(LOG_TAG, "@@@ Master sync failed " + msg);
                                 ApplicationThread.uiPost(LOG_TAG, "master sync message", new Runnable() {
                                     @Override
@@ -454,6 +460,7 @@ public class RefreshSyncActivity extends AppCompatActivity implements View.OnCli
                 @Override
                 public void execute(boolean success, String result, String msg) {
                     if (success) {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"uploadDataBase", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         File dir = Environment.getExternalStorageDirectory();
                         File uploadFile = new File(dir, "3f_" + CommonConstants.TAB_ID + "_" + nanoTime+"_CCv_"+CommonUtils.getAppVersion(RefreshSyncActivity.this) + ".gzip");
                         Log.v(LOG_TAG, "@@@ file size " + uploadFile.length());
@@ -470,6 +477,7 @@ public class RefreshSyncActivity extends AppCompatActivity implements View.OnCli
 
                     } else {
                         onComplete.execute(success, result, msg);
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"uploadDataBase", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     }
                 }
             });
@@ -525,9 +533,11 @@ public class RefreshSyncActivity extends AppCompatActivity implements View.OnCli
                         if (success) {
                             Log.v(LOG_TAG, "@@@ 3f db file upload success");
                             CommonUtils.showToast("3f db file uploaded successfully", RefreshSyncActivity.this);
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"uploadDatabaseFile", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         } else {
                             Log.v(LOG_TAG, "@@@ 3f db file upload failed due to " + msg);
                             CommonUtils.showToast("3f db file upload failed due to \n"+ msg, RefreshSyncActivity.this);
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"uploadDatabaseFile", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         }
                     }
                 });

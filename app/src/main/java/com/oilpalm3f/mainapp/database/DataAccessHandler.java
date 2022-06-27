@@ -1,5 +1,7 @@
 package com.oilpalm3f.mainapp.database;
 
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -531,8 +533,11 @@ public class DataAccessHandler {
                         @Override
                         public void run() {
                             if (success) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateMasterSyncDate", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 PrefUtil.putBool(context, CommonConstants.IS_MASTER_SYNC_SUCCESS, true);
                                 Log.v(LOG_TAG, "@@@ MasterVersionTrackingSystem inserted ");
+                            }else{
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"updateMasterSyncDate", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             }
                         }
                     });

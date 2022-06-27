@@ -878,6 +878,16 @@ public class DataBaseUpgrade {
         String column12 = "ALTER TABLE Consignment Add LooseFruitWeight int";
         String column13 = "ALTER TABLE Consignment Add TareWeight2 Float";
 
+        //for error logs
+        String ErrorLogTable = "CREATE TABLE ErrorLogs (    " +
+                "    Id          INTEGER       PRIMARY KEY AUTOINCREMENT,\n" +
+                "    ClassName   VARCHAR ,\n" +
+                "    MethodName   VARCHAR ,\n" +
+                "    TabId   VARCHAR ,\n" +
+                "    errormessage       VARCHAR(180000),\n" +
+                "    errordetails      VARCHAR ,\n" +
+                "    CreatedDate DATETIME\n" +
+                ");";
 
         try {
 
@@ -894,7 +904,8 @@ public class DataBaseUpgrade {
             db.execSQL(column11);
             db.execSQL(column12);
             db.execSQL(column13);
-
+            //for error logs
+            db.execSQL(ErrorLogTable);
 
         } catch (Exception e) {
             e.printStackTrace();

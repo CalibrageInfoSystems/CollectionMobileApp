@@ -218,4 +218,25 @@ public class Palm3FoilDatabase extends SQLiteOpenHelper {
         }
         mSqLiteDatabase = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READWRITE);
     }
+
+    public void insertErrorLogs(String ClassName ,String methodName ,String tabId,String errormsg, String error,String createdDate){
+        try {
+            openDatabase();
+            ContentValues errorValues = new ContentValues();
+            errorValues.put("ClassName",ClassName);
+            errorValues.put("MethodName",methodName);
+            //errorValues.put("TabId",CommonConstants.TAB_ID);
+            errorValues.put("TabId",tabId);
+            errorValues.put("errormessage",errormsg);
+            errorValues.put("errordetails",error);
+            //errorValues.put("CreatedDate",CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
+            errorValues.put("CreatedDate",createdDate);
+            mSqLiteDatabase.insert("ErrorLogs",null,errorValues);
+            Log.v("Error Details","Error Details inserted ");
+        }catch (SQLiteException se){
+            Log.v("Error Details","Error Details failed to Inserted "+se);
+            se.printStackTrace();
+        }
+
+    }
 }

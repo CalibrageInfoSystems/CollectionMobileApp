@@ -42,6 +42,7 @@ import es.dmoral.toasty.Toasty;
 
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.USER_DETAILS;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.USER_VILLAGES;
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
 
 
 //Login Screen
@@ -162,9 +163,11 @@ public class LoginScreen extends AppCompatActivity {
                public void execute(boolean success, Object result, String msg) {
                    ProgressBar.hideProgressBar();
                    if (success) {
+                       palm3FoilDatabase.insertErrorLogs(LOG_TAG,"masterSync", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                        if (!msg.equalsIgnoreCase("Sync is up-to-date")) {
                            UiUtils.showCustomToastMessage("Data synced successfully", LoginScreen.this, 0);
-
+                           palm3FoilDatabase.insertErrorLogs(LOG_TAG,"masterSync",CommonConstants.TAB_ID,"result.toString()",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
+                           //palm3FoilDatabase.insertErrorLogs(LOG_TAG,"masterSync","result.toString()",msg);
                            //Toast.makeText(LoginScreen.this, "Data synced successfully", Toast.LENGTH_SHORT).show();
                            List<UserSync> userSyncList;
                           // userSyncList = (List<UserSync>)dataAccessHandler.getUserSyncData(Queries.getInstance().countOfMasterSync());
@@ -194,6 +197,8 @@ public class LoginScreen extends AppCompatActivity {
                        }
                    } else {
                        Log.v(LOG_TAG, "@@@ Master sync failed " + msg);
+                       //palm3FoilDatabase.insertErrorLogs(LOG_TAG,"masterSync","result.toString()",msg);
+                       palm3FoilDatabase.insertErrorLogs(LOG_TAG,"masterSync",CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                        ApplicationThread.uiPost(LOG_TAG, "master sync message", new Runnable() {
                            @Override
                            public void run() {
@@ -218,6 +223,7 @@ public class LoginScreen extends AppCompatActivity {
                @Override
                public void execute(boolean success, final Object result, String msg) {
                    if (success) {
+                       palm3FoilDatabase.insertErrorLogs(LOG_TAG,"transactionSync", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                        ApplicationThread.uiPost(LOG_TAG, "transactions sync message", new Runnable() {
                            @Override
                            public void run() {
@@ -228,6 +234,7 @@ public class LoginScreen extends AppCompatActivity {
                            }
                        });
                    } else {
+                       palm3FoilDatabase.insertErrorLogs(LOG_TAG,"transactionSync", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                        ApplicationThread.uiPost(LOG_TAG, "transactions sync failed message", new Runnable() {
                            @Override
                            public void run() {

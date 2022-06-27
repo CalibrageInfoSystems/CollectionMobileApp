@@ -139,6 +139,15 @@
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />
+
+        <receiver android:name="com.oilpalm3f.mainapp.BroadCastReciver.myBackgroundProcess"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="BackgroundProcess"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

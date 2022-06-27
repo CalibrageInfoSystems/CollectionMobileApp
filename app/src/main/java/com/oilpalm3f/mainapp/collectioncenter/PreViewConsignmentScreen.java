@@ -52,6 +52,7 @@ import static com.oilpalm3f.mainapp.database.DatabaseKeys.TABLE_CONSIGNMENT;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.COLLECTION_CENTER_DATA;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.COLLECTION_CENTER_ID;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.MILL_INFORMATION;
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
 
 /**
  * Created by BaliReddy on 09/02/17.
@@ -77,11 +78,11 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
     private android.widget.Button generateReceipt;
     private TextView collectionCenterName, collectionCenterCode, collectionCenterVillage, collectionIDTxt;
     private String receiptCode = "";
-    private String millName = "",isThere = "",sizeOfTruck = "";
-    private TextView tv_vehicleType,tv_mobile_no;
+    private String millName = "", isThere = "", sizeOfTruck = "";
+    private TextView tv_vehicleType, tv_mobile_no;
     private LinkedHashMap<String, String> vehcile_typeDataMap;
     private String vehcile_typeName;
-    String date,currentDate_am_pm;
+    String date, currentDate_am_pm;
     public int financialYear;
     private String days = "";
 
@@ -125,45 +126,43 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
 
     private void initView() {
         collectionId = rootView.findViewById(R.id.collection_id);
-        vehNum =  rootView.findViewById(R.id.veh_num);
-        driverName =  rootView.findViewById(R.id.driverName);
-        dateAndTimeStamp =  rootView.findViewById(R.id.date_and_time_stamp);
-        consignWeight =  rootView.findViewById(R.id.consign_weight);
-        opetrName =   rootView.findViewById(R.id.opetr_name);
-        millname =   rootView.findViewById(R.id.millname);
+        vehNum = rootView.findViewById(R.id.veh_num);
+        driverName = rootView.findViewById(R.id.driverName);
+        dateAndTimeStamp = rootView.findViewById(R.id.date_and_time_stamp);
+        consignWeight = rootView.findViewById(R.id.consign_weight);
+        opetrName = rootView.findViewById(R.id.opetr_name);
+        millname = rootView.findViewById(R.id.millname);
         generateReceipt = (Button) rootView.findViewById(R.id.generateReceipt);
-        tv_vehicleType= rootView.findViewById(R.id.tv_vehicleType);
-        tv_mobile_no= rootView.findViewById(R.id.tv_mobile_no);
+        tv_vehicleType = rootView.findViewById(R.id.tv_vehicleType);
+        tv_mobile_no = rootView.findViewById(R.id.tv_mobile_no);
 
-        collectionCenterName =   rootView.findViewById(R.id.collection_center_name);
-        collectionCenterCode =   rootView.findViewById(R.id.collection_center_code);
-        collectionCenterVillage =   rootView.findViewById(R.id.collection_center_village);
+        collectionCenterName = rootView.findViewById(R.id.collection_center_name);
+        collectionCenterCode = rootView.findViewById(R.id.collection_center_code);
+        collectionCenterVillage = rootView.findViewById(R.id.collection_center_village);
 
         final Calendar calendar = Calendar.getInstance();
         final FiscalDate fiscalDate = new FiscalDate(calendar);
         financialYear = fiscalDate.getFiscalYear();
 
 
-
-
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         try {
             String currentdate = CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_3);
-            String financalDate = "01/04/"+String.valueOf(financialYear);
+            String financalDate = "01/04/" + String.valueOf(financialYear);
             Date date1 = dateFormat.parse(currentdate);
             Date date2 = dateFormat.parse(financalDate);
             long diff = date1.getTime() - date2.getTime();
-            String noOfDays = String.valueOf(TimeUnit.DAYS.convert(diff,TimeUnit.MILLISECONDS)+1);
-            days = StringUtils.leftPad(noOfDays,3,"0");
-            com.oilpalm3f.mainapp.cloudhelper.Log.v(LOG_TAG,"days -->"+days);
+            String noOfDays = String.valueOf(TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) + 1);
+            days = StringUtils.leftPad(noOfDays, 3, "0");
+            com.oilpalm3f.mainapp.cloudhelper.Log.v(LOG_TAG, "days -->" + days);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
 
-        receiptCode = ccDataAccessHandler.getGeneratedCollectionCode(selectedCollectionCenter.getCode(), ccDataAccessHandler.RECEIPT_CODE_INITIAL, ccDataAccessHandler.TABLE_CONSIGNMENT,days);
+        receiptCode = ccDataAccessHandler.getGeneratedCollectionCode(selectedCollectionCenter.getCode(), ccDataAccessHandler.RECEIPT_CODE_INITIAL, ccDataAccessHandler.TABLE_CONSIGNMENT, days);
 
 
         //Generate Receipt on Click Listener
@@ -171,9 +170,11 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
             @Override
             public void onClick(View v) {
 
-               saveConsignmentData(getContext());
-
-//            s
+                saveConsignmentData(getContext());
+                FragmentManager fm = getChildFragmentManager();
+                PrinterChooserFragment printerChooserFragment = new PrinterChooserFragment();
+                printerChooserFragment.setPrinterType(PreViewConsignmentScreen.this);
+                printerChooserFragment.show(fm, "bluetooth fragment");
             }
         });
     }
@@ -221,7 +222,7 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
             dataMap.put(DatabaseKeys.COLUMN_TAREWEIGHT, selectedConsignment.getTareweight());
             dataMap.put(DatabaseKeys.COLUMN_NETWEIGHT, selectedConsignment.getNetweight());
             dataMap.put(DatabaseKeys.COLUMN_WEIGHTDIFF, selectedConsignment.getWeightdifference());
-            dataMap.put(DatabaseKeys.COLUMN_RECEIPTGENERATEDDATE,date);
+            dataMap.put(DatabaseKeys.COLUMN_RECEIPTGENERATEDDATE, date);
             dataMap.put(DatabaseKeys.COLUMN_RECEIPTCODE, receiptCode);
             dataMap.put(DatabaseKeys.COLUMN_ISACTIVE, selectedConsignment.getIsActive());
             dataMap.put(DatabaseKeys.COLUMN_CREATEDBYUSERID, CommonConstants.USER_ID);
@@ -233,7 +234,7 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
             dataMap.put(DatabaseKeys.COLUMN_REJECTEDBUNCHES, selectedConsignment.getRejectedBunches());
             dataMap.put(DatabaseKeys.COLUMN_ACCEPTEDBUNCHES, selectedConsignment.getAcceptedBunches());
             dataMap.put(DatabaseKeys.COLUMN_REMARKS, selectedConsignment.getRemarks());
-            Log.v("@@@remarkspre",""+selectedConsignment.getRemarks());
+            Log.v("@@@remarkspre", "" + selectedConsignment.getRemarks());
 
             dataMap.put(DatabaseKeys.COLUMN_GRADERNAME, selectedConsignment.getGraderName());
             String[] vT = selectedConsignment.getVehcileType().split("@");
@@ -256,8 +257,10 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
                         @Override
                         public void run() {
                             if (success) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG, "saveConsignmentData", CommonConstants.TAB_ID, "", msg, CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 saveConsignmentStatusHistoryData(dataAccessHandler);
                             } else {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG, "saveConsignmentData", CommonConstants.TAB_ID, "", msg, CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 UiUtils.showCustomToastMessage("Data saving failed for Consignment", getActivity(), 1);
 
                                 Log.e(LOG_TAG, "@@@@ Error while saving ConsignmentStatusHistoryData");
@@ -302,6 +305,7 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
                         public void run() {
 
                             if (success) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG, "saveConsignmentStatusHistoryData", CommonConstants.TAB_ID, "", msg, CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 UiUtils.showCustomToastMessage("Data saved", getActivity(), 0);
                                 if (!TextUtils.isEmpty(SendConsignment.mCurrentPhotoPath) && SendConsignment.mCurrentPhotoPath.length() > 0) {
                                     dataAccessHandler.insertConsignmentImageData(selectedConsignment.getCode(), SendConsignment.mCurrentPhotoPath, "false");
@@ -312,24 +316,26 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
                                         @Override
                                         public void execute(boolean success, Object result, String msg) {
                                             if (success) {
+                                                palm3FoilDatabase.insertErrorLogs(LOG_TAG, "saveConsignmentStatusHistoryData", CommonConstants.TAB_ID, "", msg, CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                                 ApplicationThread.uiPost(LOG_TAG, "transactions sync message", new Runnable() {
                                                     @Override
                                                     public void run() {
                                                         enablePrintBtn(true);
                                                         SendConsignment.mCurrentPhotoPath = "";
                                                         UiUtils.showCustomToastMessage("Successfully data sent to server", getActivity(), 0);
-                                                        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                                        //getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 //                                                        getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
 //                                                        getActivity().finish();
                                                     }
                                                 });
                                             } else {
+                                                palm3FoilDatabase.insertErrorLogs(LOG_TAG, "saveConsignmentStatusHistoryData", CommonConstants.TAB_ID, "", msg, CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                                 ApplicationThread.uiPost(LOG_TAG, "transactions sync failed message", new Runnable() {
                                                     @Override
                                                     public void run() {
                                                         enablePrintBtn(true);
                                                         UiUtils.showCustomToastMessage("Data sync failed", getActivity(), 1);
-                                                        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                                        //getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                                                     }
                                                 });
                                             }
@@ -337,11 +343,12 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
                                     });
                                 } else {
                                     enablePrintBtn(true);
-                                    getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                    //getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 //                                    getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
 //                                    getActivity().finish();
                                 }
                             } else {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG, "saveConsignmentStatusHistoryData", CommonConstants.TAB_ID, "", msg, CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 Log.e(LOG_TAG, "@@@@ Error while saving ConsignmentStatusHistoryData");
                                 UiUtils.showCustomToastMessage("Data saving failed", getActivity(), 1);
                             }
@@ -350,6 +357,7 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
                 }
             });
         } catch (Exception e) {
+            palm3FoilDatabase.insertErrorLogs(LOG_TAG, "saveConsignmentStatusHistoryData", CommonConstants.TAB_ID, "", e.getMessage(), CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
             Log.e(LOG_TAG, "@@@@ Error while saving ConsignmentStatusHistoryData due to " + e.getMessage());
         }
     }
@@ -360,18 +368,20 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
         //CommonConstants.TABLET_ID = ccDataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getTabId(CommonUtils.getIMEInumberID(getContext())));
 
         String convertedNum = ccDataAccessHandler.getGeneratedCollectionConvertedNum(selectedCollectionCenter.getCode(), ccDataAccessHandler.RECEIPT_CODE_INITIAL, ccDataAccessHandler.TABLE_CONSIGNMENT);
-       // receiptCode = ccDataAccessHandler.getGeneratedCollectionCode(selectedCollectionCenter.getCode(), ccDataAccessHandler.RECEIPT_CODE_INITIAL, ccDataAccessHandler.TABLE_CONSIGNMENT,days);
+        // receiptCode = ccDataAccessHandler.getGeneratedCollectionCode(selectedCollectionCenter.getCode(), ccDataAccessHandler.RECEIPT_CODE_INITIAL, ccDataAccessHandler.TABLE_CONSIGNMENT,days);
         mPrinter.init();
         StringBuilder sb = new StringBuilder();
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
+        mPrinter.setLeftMargin(0, 0);
         mPrinter.printText(" 3F OILPALM PVT LTD " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
         mPrinter.printText("   Consignment Dispatch Receipt" + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
-        mPrinter.setLeftMargin(15, 15);
+        /*mPrinter.setLeftMargin(15, 15);*/
+        mPrinter.setLeftMargin(0, 0);
         sb.append("==============================================" + "\n");
         sb.append("  DateTime: ");
         sb.append(" ").append(currentDate_am_pm).append("\n");
@@ -397,13 +407,13 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
         sb.append(" Consignment weight: ").append(selectedConsignment.getTotalweight()).append(" Kg").append("\n");
         sb.append(" ");
         sb.append("==============================================\n");
-        if(isThere.equalsIgnoreCase("Yes")) {
-            sb.append("Truck Size:  "+sizeOfTruck).append("\n");
-            sb.append("Basic Transport Cost: "+selectedConsignment.getTransportCost()).append("\n");
-            sb.append("Sharing Cost: "+selectedConsignment.getSharingCost()).append("\n");
-            sb.append("OverWeight Cost: "+selectedConsignment.getOverWeightCost()).append("\n");
-            sb.append("Expected Transport Cost: "+selectedConsignment.getExpectedCost()).append("\n");
-            sb.append("Actual Transport Cost: "+selectedConsignment.getActualCost()).append("\n");
+        if (isThere.equalsIgnoreCase("Yes")) {
+            sb.append("Truck Size:  " + sizeOfTruck).append("\n");
+            sb.append("Basic Transport Cost: " + selectedConsignment.getTransportCost()).append("\n");
+            sb.append("Sharing Cost: " + selectedConsignment.getSharingCost()).append("\n");
+            sb.append("OverWeight Cost: " + selectedConsignment.getOverWeightCost()).append("\n");
+            sb.append("Expected Transport Cost: " + selectedConsignment.getExpectedCost()).append("\n");
+            sb.append("Actual Transport Cost: " + selectedConsignment.getActualCost()).append("\n");
             sb.append("==============================================\n");
         }
         sb.append(" ");
@@ -437,23 +447,35 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
 
         Integer totalweight = (int) (selectedConsignment.getTotalweight());
         String TotalWeight = StringUtils.leftPad(String.valueOf(totalweight), 5, "0");
-        Log.d("TotalWeightis", TotalWeight  + "");
+        Log.d("TotalWeightis", TotalWeight + "");
 
         String hashString = ccDataAccessHandler.getCurrentYear() + tab_Id + collectionCenterId + convertednum + days + TotalWeight;
-        String qrCodeValue = hashString.substring(0,24);
-        Log.d("qrCodeValueis", qrCodeValue  + "");
+        String qrCodeValue = hashString.substring(0, 24);
+        Log.d("qrCodeValueis", qrCodeValue + "");
         Barcode barcode = new Barcode(PrinterConstants.BarcodeType.QRCODE, 3, 95, 3, qrCodeValue);
 
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
 
-        if(CommonConstants.PrinterName.contains("AMIGOS")){
+        /*if (CommonConstants.PrinterName.contains("AMIGOS")) {
+            com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG, "########### NEW ##############");
+            print_qr_code(mPrinter, qrCodeValue);
+        } else {
+            com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG, "########### OLD ##############");
+            mPrinter.printBarCode(barcode);
+        }*/
+
+        if((CommonConstants.PrinterName.contains("AMIGOS")) && !(CommonConstants.PrinterName.contains("G-8BT3"))){
             com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG,"########### NEW ##############");
             print_qr_code(mPrinter,qrCodeValue);
+        }else if (CommonConstants.PrinterName.contains("G-8BT3 AMIGOS")){
+            com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG,"########### NEWEST ##############");
+            print_qr_codee(mPrinter,qrCodeValue);
         }else{
             com.oilpalm3f.mainapp.cloudhelper.Log.d(LOG_TAG,"########### OLD ##############");
             mPrinter.printBarCode(barcode);
         }
+
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
         mPrinter.printText(qrCodeValue);
@@ -483,15 +505,15 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
         } finally {
             if (printSuccess) {
                 if (printCount == 2) {
-                    saveConsignmentData(context);
+                    //saveConsignmentData(context);
+                    getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 }
             }
         }
     }
 
     //Generates QR Code
-    public void print_qr_code(PrinterInstance mPrinter,String qrdata)
-    {
+    public void print_qr_code(PrinterInstance mPrinter, String qrdata) {
         int store_len = qrdata.length() + 3;
         byte store_pL = (byte) (store_len % 256);
         byte store_pH = (byte) (store_len / 256);
@@ -501,7 +523,7 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
         //              Hex     1D      28      6B      04      00      31      41      n1(x32)     n2(x00) - size of model
         // set n1 [49 x31, model 1] [50 x32, model 2] [51 x33, micro qr code]
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=140
-        byte[] modelQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x04, (byte)0x00, (byte)0x31, (byte)0x41, (byte)0x32, (byte)0x00};
+        byte[] modelQR = {(byte) 0x1d, (byte) 0x28, (byte) 0x6b, (byte) 0x04, (byte) 0x00, (byte) 0x31, (byte) 0x41, (byte) 0x32, (byte) 0x00};
 
         // QR Code: Set the size of module
         // Hex      1D      28      6B      03      00      31      43      n
@@ -509,26 +531,26 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
 
 
-        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x10};
+        byte[] sizeQR = {(byte) 0x1d, (byte) 0x28, (byte) 0x6b, (byte) 0x03, (byte) 0x00, (byte) 0x31, (byte) 0x43, (byte) 0x10};
 
 
         //          Hex     1D      28      6B      03      00      31      45      n
         // Set n for error correction [48 x30 -> 7%] [49 x31-> 15%] [50 x32 -> 25%] [51 x33 -> 30%]
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=142
-        byte[] errorQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x45, (byte)0x31};
+        byte[] errorQR = {(byte) 0x1d, (byte) 0x28, (byte) 0x6b, (byte) 0x03, (byte) 0x00, (byte) 0x31, (byte) 0x45, (byte) 0x31};
 
 
         // QR Code: Store the data in the symbol storage area
         // Hex      1D      28      6B      pL      pH      31      50      30      d1...dk
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=143
         //                        1D          28          6B         pL          pH  cn(49->x31) fn(80->x50) m(48->x30) d1…dk
-        byte[] storeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, store_pL, store_pH, (byte)0x31, (byte)0x50, (byte)0x30};
+        byte[] storeQR = {(byte) 0x1d, (byte) 0x28, (byte) 0x6b, store_pL, store_pH, (byte) 0x31, (byte) 0x50, (byte) 0x30};
 
 
         // QR Code: Print the symbol data in the symbol storage area
         // Hex      1D      28      6B      03      00      31      51      m
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=144
-        byte[] printQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x51, (byte)0x30};
+        byte[] printQR = {(byte) 0x1d, (byte) 0x28, (byte) 0x6b, (byte) 0x03, (byte) 0x00, (byte) 0x31, (byte) 0x51, (byte) 0x30};
 
         // flush() runs the print job and clears out the print buffer
 //        flush();
@@ -590,5 +612,61 @@ public class PreViewConsignmentScreen extends BaseFragment implements BluetoothD
                 generateReceipt.setFocusable(enable);
             }
         });
+    }
+
+    public void print_qr_codee(PrinterInstance mPrinter,String qrdata)
+    {
+        int store_len = qrdata.length() + 3;
+        byte store_pL = (byte) (store_len % 256);
+        byte store_pH = (byte) (store_len / 256);
+
+
+        // QR Code: Select the modelc
+        //Hex     1D      28      6B      04      00      31      41      n1(x32)     n2(x00) - size of model
+        // set n1 [49 x31, model 1] [50 x32, model 2] [51 x33, micro qr code]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=140
+        //byte[] modelQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x04, (byte)0x00, (byte)0x31, (byte)0x41, (byte)0x32, (byte)0x00};//original
+        byte[] modelQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x04, (byte)0x00, (byte)0x31, (byte)0x41, (byte)0x49, (byte)0x00};
+
+        // QR Code: Set the size of module
+        // Hex      1D      28      6B      03      00      31      43      n
+        // n depends on the printer
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
+
+        //byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x10};//original
+        byte[] sizeQR = {(byte)0x1d, (byte)0x0, (byte)0x0, (byte)0x0, (byte)0x00, (byte)0x0, (byte)0x0, (byte)0x10};
+
+
+        //Hex     1D      28      6B      03      00      31      45      n
+        // Set n for error correction [48 x30 -> 7%] [49 x31-> 15%] [50 x32 -> 25%] [51 x33 -> 30%]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=142
+        byte[] errorQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x45, (byte)0x31};//original
+
+
+
+        // QR Code: Store the data in the symbol storage area
+        // Hex      1D      28      6B      pL      pH      31      50      30      d1...dk
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=143
+        //                        1D          28          6B         pL          pH  cn(49->x31) fn(80->x50) m(48->x30) d1…dk
+        byte[] storeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, store_pL, store_pH, (byte)0x31, (byte)0x50, (byte)0x30};//original
+
+
+        // QR Code: Print the symbol data in the symbol storage area
+        // Hex      1D      28      6B      03      00      31      51      m
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=144
+        byte[] printQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x51, (byte)0x30};//original
+
+        // flush() runs the print job and clears out the print buffer
+//        flush();
+
+        // write() simply appends the data to the buffer
+        mPrinter.sendByteData(modelQR);
+
+        mPrinter.sendByteData(sizeQR);
+        mPrinter.sendByteData(errorQR);
+        mPrinter.sendByteData(storeQR);
+        mPrinter.sendByteData(qrdata.getBytes());
+        mPrinter.sendByteData(printQR);
+
     }
 }

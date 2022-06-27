@@ -1,5 +1,7 @@
 package com.oilpalm3f.mainapp.collectioncenter;
 
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
+
 import android.app.DatePickerDialog;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -220,6 +222,7 @@ public class CollectionReport extends OilPalmBaseActivity implements onPrintOpti
                     public void execute(boolean success, final List<CollectionReportModel> reports, String msg) {
                         ProgressBar.hideProgressBar();
                         if (success) {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getCollectionCenterReports", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             if (reports != null && reports.size() > 0) {
                                 mReportsList.clear();
                                 mReportsList = reports;
@@ -249,6 +252,7 @@ public class CollectionReport extends OilPalmBaseActivity implements onPrintOpti
                                 });
                             }
                         } else {
+                            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"getCollectionCenterReports", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                             ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
                                 @Override
                                 public void run() {
@@ -349,12 +353,14 @@ public class CollectionReport extends OilPalmBaseActivity implements onPrintOpti
 //        mPrinter.printText(subTitle + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
-        mPrinter.setLeftMargin(15, 15);
+        /*mPrinter.setLeftMargin(15, 15);*/
+        mPrinter.setLeftMargin(0, 0);
         mPrinter.setCharacterMultiple(0, 1);
         mPrinter.printText("Duplicate Copy" + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
-        mPrinter.setLeftMargin(15, 15);
+        /*mPrinter.setLeftMargin(15, 15);*/
+        mPrinter.setLeftMargin(0, 0);
         sb.append("--------------------------------------------"+"\n");
         sb.append("  DateTime: ");
         sb.append(" " + selectedReport.getCreatedDate() + "\n");

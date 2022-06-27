@@ -30,7 +30,7 @@ public class SplashScreen extends AppCompatActivity {
 
     public static final String LOG_TAG = SplashScreen.class.getName();
 
-    private Palm3FoilDatabase palm3FoilDatabase;
+    public static Palm3FoilDatabase palm3FoilDatabase;
     private String[] PERMISSIONS_REQUIRED = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -94,11 +94,13 @@ public class SplashScreen extends AppCompatActivity {
                 public void execute(boolean success, Object result, String msg) {
                     ProgressBar.hideProgressBar();
                     if (success) {
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"startMasterSync",CommonConstants.TAB_ID,"result.toString()",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         PrefUtil.putBool(SplashScreen.this, CommonConstants.IS_MASTER_SYNC_SUCCESS, true);
                         startActivity(new Intent(SplashScreen.this, LoginScreen.class));
                         finish();
                     } else {
                         Log.v(LOG_TAG, "@@@ Master sync failed " + msg);
+                        palm3FoilDatabase.insertErrorLogs(LOG_TAG,"startMasterSync",CommonConstants.TAB_ID,"result.toString()",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                         ApplicationThread.uiPost(LOG_TAG, "master sync message", new Runnable() {
                             @Override
                             public void run() {

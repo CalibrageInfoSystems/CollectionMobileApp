@@ -61,6 +61,7 @@ import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.EXTRA_PLOTS;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.PRIVATE_WEIGHBRIDGE_INFO;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.SELECTED_FARMER_DATA;
 import static com.oilpalm3f.mainapp.datasync.helpers.DataManager.SELECTED_FARMER_PLOT_DATA;
+import static com.oilpalm3f.mainapp.ui.SplashScreen.palm3FoilDatabase;
 
 //To Print the Collections
 public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragment.onDeviceSelected, onPrinterType, UsbDevicesListFragment.onUsbDeviceSelected {
@@ -539,10 +540,10 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
                 }else {
                     saveCollectionData();
                 }
-//                FragmentManager fm = getChildFragmentManager();
-//                PrinterChooserFragment printerChooserFragment = new PrinterChooserFragment();
-//                printerChooserFragment.setPrinterType(PrintReceipt.this);
-//                printerChooserFragment.show(fm, "bluetooth fragment");
+                FragmentManager fm = getChildFragmentManager();
+                PrinterChooserFragment printerChooserFragment = new PrinterChooserFragment();
+                printerChooserFragment.setPrinterType(PrintReceipt.this);
+                printerChooserFragment.show(fm, "bluetooth fragment");
 
             }
         });
@@ -569,6 +570,7 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
             dataToInsert = new ArrayList();
             dataToInsert.add(CommonUtils.toMap(ccData));
         } catch (JSONException e) {
+            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionFarmerWithOutPlotData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
             Log.e(LOG_TAG, "@@@ error while converting CollectionFarmerWithOutPlot data");
         }
         Log.v(LOG_TAG, "@@ enteredCollectionFarmerWithOutPlot data " + ccData.toString());
@@ -577,6 +579,7 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
             @Override
             public void execute(boolean success, String result, String msg) {
                 if (success) {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionFarmerWithOutPlotData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     if (!TextUtils.isEmpty(enteredCOLFarmerWOPData.getRecieptlocation()) && enteredCOLFarmerWOPData.getRecieptlocation().length() > 0) {
                         dataAccessHandler.insertImageDataColectionFarmer(enteredCOLFarmerWOPData.getCode(), enteredCOLFarmerWOPData.getFarmercode(), enteredCOLFarmerWOPData.getRecieptlocation(), "false");
                     }
@@ -590,16 +593,18 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
                             @Override
                             public void execute(boolean success, Object result, String msg) {
                                 if (success) {
+                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionFarmerWithOutPlotData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                     enablePrintBtn(true);
                                     ApplicationThread.uiPost(LOG_TAG, "transactions sync message", new Runnable() {
                                         @Override
                                         public void run() {
                                             UiUtils.showCustomToastMessage("Successfully data sent to server", getActivity(), 0);
-                                            getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
+                                            //getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
 //                                                        getActivity().finish();
                                         }
                                     });
                                 } else {
+                                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionFarmerWithOutPlotData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                     ApplicationThread.uiPost(LOG_TAG, "transactions sync failed message", new Runnable() {
                                         @Override
                                         public void run() {
@@ -611,11 +616,12 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
                         });
                     } else {
                         enablePrintBtn(true);
-                        getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
+                        //getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
 //                                    getActivity().finish();
                     }
 
                 } else {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionFarmerWithOutPlotData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     Log.e(LOG_TAG, "@@@ collection center without plot data saving failed due to " + msg);
                 }
             }
@@ -650,6 +656,7 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
             dataToInsert = new ArrayList();
             dataToInsert.add(CommonUtils.toMap(ccData));
         } catch (JSONException e) {
+            palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionData", CommonConstants.TAB_ID,"",e.getMessage(),CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
             Log.e(LOG_TAG, "@@@ error while converting collection center data");
         }
         Log.v(LOG_TAG, "@@ entered data " + ccData.toString());
@@ -658,11 +665,13 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
             @Override
             public void execute(boolean success, String result, String msg) {
                 if (success) {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     Log.v(LOG_TAG, "@@@ collection center data saved successfully");
                     dataAccessHandler.insertData(ccDataAccessHandler.TABLE_COLLECTION_PLOT_XREF, getCollectionXrefData(), getActivity(), new ApplicationThread.OnComplete<String>() {
                         @Override
                         public void execute(boolean success, String result, String msg) {
                             if (success) {
+                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                 if (!TextUtils.isEmpty(enteredData.getRecieptlocation()) && enteredData.getRecieptlocation().length() > 0) {
                                     dataAccessHandler.insertImageData(enteredData.getCode(), enteredData.getFarmercode(), enteredData.getRecieptlocation(), "false");
                                 }
@@ -673,16 +682,18 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
                                         @Override
                                         public void execute(boolean success, Object result, String msg) {
                                             if (success) {
+                                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                                 enablePrintBtn(true);
                                                 ApplicationThread.uiPost(LOG_TAG, "transactions sync message", new Runnable() {
                                                     @Override
                                                     public void run() {
                                                         UiUtils.showCustomToastMessage("Successfully data sent to server", getActivity(), 0);
-                                                        getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
+                                                        //getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
 //                                                        getActivity().finish();
                                                     }
                                                 });
                                             } else {
+                                                palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                                                 ApplicationThread.uiPost(LOG_TAG, "transactions sync failed message", new Runnable() {
                                                     @Override
                                                     public void run() {
@@ -694,7 +705,7 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
                                     });
                                 } else {
                                     enablePrintBtn(true);
-                                    getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
+                                    //getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
 //                                    getActivity().finish();
                                 }
                             } else {
@@ -705,6 +716,7 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
                         }
                     });
                 } else {
+                    palm3FoilDatabase.insertErrorLogs(LOG_TAG,"saveCollectionData", CommonConstants.TAB_ID,"",msg,CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
                     Log.e(LOG_TAG, "@@@ collection center data saving failed due to " + msg);
                 }
             }
@@ -820,7 +832,8 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
      //   mPrinter.printText("   Oil Palm F.F.B Receipt " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
-        mPrinter.setLeftMargin(15, 15);
+        /*mPrinter.setLeftMargin(15, 15);*/
+        mPrinter.setLeftMargin(0, 0);
         sb.append("--------------------------------------------" + "\n");
         sb.append("  DateTime: ");
         sb.append(" ").append(currentDate_am_pm).append("\n");
@@ -1124,11 +1137,14 @@ public class PrintReceipt extends BaseFragment implements BluetoothDevicesFragme
         } finally {
             if (printSuccess) {
                 if (printCount == 2) {
-                    if (ColFarmerWithOutPlotcode.equalsIgnoreCase("CCFARMERW") || (ColFarmerWithOutPlotcode.equalsIgnoreCase("FFBFARMER"))) {
+                    /*if (ColFarmerWithOutPlotcode.equalsIgnoreCase("CCFARMERW") || (ColFarmerWithOutPlotcode.equalsIgnoreCase("FFBFARMER"))) {
                         saveCollectionFarmerWithOutPlotData();
                     } else {
                         saveCollectionData();
-                    }
+                    }*/
+
+                    UiUtils.showCustomToastMessage("Print Success", getActivity(), 0);
+                    getActivity().startActivity(new Intent(getActivity(), CollectionCenterHomeScreen.class));
 
                 }
             }
